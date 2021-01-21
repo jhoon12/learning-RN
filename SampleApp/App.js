@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   StyleSheet,
   Text,
@@ -9,45 +9,87 @@ import {
   ScrollView,
   ImageBackground,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Setting from './Setting';
 
 const App = () => {
   const [dday, setDday] = useState(new Date());
   const [ddayTitle, setDdayTitle] = useState('new Title');
   const [chatLog, setChatLog] = useState([]);
-  const [settingModal, setSettingModal]  = useState(false);
+  const [settingModal, setSettingModal] = useState(false);
 
   const modalHandler = () => {
-    setSettingModal(prev=>!prev)
-  }
-  const settingHandler = (title, date) => {
+    setSettingModal((prev) => !prev);
+  };
+  const settingHandler = async (title, date) => {
     setDdayTitle(title);
     setDday(date);
+    try {
+      const dday = {
+        title: title,
+        date: date,
+      };
+      const ddayString = JSON.stringify(dday);
+      await AsyncStorage.setItem('@dday', ddayString);
+    } catch (e) {
+      console.log(e);
+    }
     modalHandler();
-  }
-  const makeDateString = ()=>{
-    return dday.getFullYear() + '년 ' + (dday.getMonth()+1) + '월 ' + dday.getDate() + '일';
-  }
-  const  makeRemainString=()=>{
+  };
+  const makeDateString = () => {
+    return (
+      dday.getFullYear() +
+      '년 ' +
+      (dday.getMonth() + 1) +
+      '월 ' +
+      dday.getDate() +
+      '일'
+    );
+  };
+  const makeRemainString = () => {
     const distance = new Date().getTime() - dday.getTime();
-    console.log(new Date(), dday,distance / (1000 * 60 * 60 * 24) )
+    console.log(new Date(), dday, distance / (1000 * 60 * 60 * 24));
     const remain = Math.floor(distance / (1000 * 60 * 60 * 24));
-    if(remain < 0) {
-      return 'D'+remain;
+    if (remain < 0) {
+      return 'D' + remain;
     } else if (remain > 0) {
-      return 'D+'+remain;
+      return 'D+' + remain;
     } else if (remain === 0) {
       return 'D-day';
     }
-  }
-  
+  };
+  useEffect(() => {
+    console.log('시작');
+  }, []);
+  useEffect(() => {
+    return  () => {
+      (async () => {
+        console.log('종료')
+        try {
+          const ddayString = await AsyncStorage.getItem('@dday');
+          if (ddayString === null) {
+            this.setState({
+              dday: new Date(),
+              ddayTitle: '',
+            });
+          } else {
+            const dday = JSON.parse(ddayString);
+            setDday(new Date(dday.date));
+            setDdayTitle(dday.title);
+          }
+        } catch (e) {
+          console.log('ERR');
+        }
+      })();
+    };
+  }, []);
   return (
     <View style={styles.container}>
       <ImageBackground
         style={{width: '100%', height: '100%'}}
         source={require('./icon/background.png')}>
         <View style={styles.settingView}>
-          <TouchableOpacity onPress={()=>modalHandler()}>
+          <TouchableOpacity onPress={() => modalHandler()}>
             <Image source={require('./icon/setting.png')} />
           </TouchableOpacity>
         </View>
@@ -65,7 +107,14 @@ const App = () => {
             </TouchableOpacity>
           </View>
         </View>
-        {settingModal ? <Setting modalHandler={modalHandler} settingHandler={settingHandler}/> : <></>}
+        {settingModal ? (
+          <Setting
+            modalHandler={modalHandler}
+            settingHandler={settingHandler}
+          />
+        ) : (
+          <></>
+        )}
       </ImageBackground>
     </View>
   );
