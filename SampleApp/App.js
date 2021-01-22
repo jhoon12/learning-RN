@@ -115,7 +115,7 @@ const App = () => {
         <View style={styles.chatView}>
           <ScrollView style={styles.chatScrollView}>
             {chatLog.map((chat, id) => (
-              <Text style={styles.chat} id={id}>{chat}</Text>
+              <Text style={styles.chat} key={id}>{chat}</Text>
             ))}
           </ScrollView>
           <View style={styles.chatControl}>
