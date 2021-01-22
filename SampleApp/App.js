@@ -16,8 +16,9 @@ const App = () => {
   const [dday, setDday] = useState(new Date());
   const [ddayTitle, setDdayTitle] = useState('new Title');
   const [chatLog, setChatLog] = useState([]);
+  const [chatInput, setChatInput] = useState('');
   const [settingModal, setSettingModal] = useState(false);
-
+ 
   const modalHandler = () => {
     setSettingModal((prev) => !prev);
   };
@@ -59,30 +60,43 @@ const App = () => {
     }
   };
   useEffect(() => {
-    console.log('시작');
-  }, []);
-  useEffect(() => {
-    return  () => {
-      (async () => {
-        console.log('종료')
-        try {
-          const ddayString = await AsyncStorage.getItem('@dday');
-          if (ddayString === null) {
-            this.setState({
-              dday: new Date(),
-              ddayTitle: '',
-            });
-          } else {
-            const dday = JSON.parse(ddayString);
-            setDday(new Date(dday.date));
-            setDdayTitle(dday.title);
-          }
-        } catch (e) {
-          console.log('ERR');
+    (async () => {
+      try {
+        const ddayString = await AsyncStorage.getItem('@dday');
+        const chatLogString = await AsyncStorage.getItem('@chat');
+        if (chatLogString == null) {
+          setChatLog([]);
+        } else {
+          const chatLog = JSON.parse(chatLogString);
+          setChatLog(chatLog);
         }
-      })();
-    };
+        if (ddayString === null) {
+          this.setState({
+            dday: new Date(),
+            ddayTitle: '',
+          });
+        } else {
+          const dday = JSON.parse(ddayString);
+          setDday(new Date(dday.date));
+          setDdayTitle(dday.title);
+          console.log(dday, ddayTitle);
+        }
+      } catch (e) {
+        console.log('ERR');
+      }
+    })();
   }, []);
+  const chatHandler = () => {
+    setChatLog([
+      ...chatLog,
+      makeDateString() + ' : ' +chatInput,
+    ]);
+    setChatInput('');
+    async () => {
+      const chatLogString = JSON.stringify(chatLog);
+      await AsyncStorage.setItem('@chat', chatLogString);
+    };
+  };
   return (
     <View style={styles.container}>
       <ImageBackground
@@ -99,10 +113,21 @@ const App = () => {
           <Text style={styles.dateText}>{makeDateString()}</Text>
         </View>
         <View style={styles.chatView}>
-          <ScrollView style={styles.chatScrollView}></ScrollView>
+          <ScrollView style={styles.chatScrollView}>
+            {chatLog.map((chat, id) => (
+              <Text style={styles.chat} id={id}>{chat}</Text>
+            ))}
+          </ScrollView>
           <View style={styles.chatControl}>
-            <TextInput style={styles.chatInput} />
-            <TouchableOpacity style={styles.sendButton}>
+            <TextInput
+              style={styles.chatInput}
+              value={chatInput}
+              onChangeText={(changedText) => setChatInput(changedText)}
+            />
+           <TouchableOpacity
+              style={styles.sendButton}
+              onPress={()=>chatHandler()}
+            >
               <Text>전송</Text>
             </TouchableOpacity>
           </View>
@@ -188,6 +213,12 @@ const styles = StyleSheet.create({
     margin: 10,
     borderWidth: 1,
     borderColor: '#a5a5a5',
+  },
+  chat: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#4A4A4A',
+    margin: 2,
   },
 });
 export default App;

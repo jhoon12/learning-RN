@@ -28,7 +28,6 @@ const Setting = ({modalHandler, settingHandler}) => {
           <Text style={styles.doneText}>완료</Text>
         </TouchableOpacity>
       </View>
-      <Text>설정창</Text>
     </View>
   );
 };
