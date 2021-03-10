@@ -5,8 +5,10 @@ import {
   TextInput,
   NativeSyntheticEvent,
   TextInputChangeEventData,
+  Touchable,
+  TouchableOpacity,
 } from 'react-native';
-import styles from './style';
+import * as S  from './style';
 
 interface prop {
   name: number;
@@ -15,6 +17,7 @@ interface ListInt {
   id: number;
   text: string;
 }
+
 const TodoList: React.FC<prop> = (props) => {
   const [text, setText] = useState<string>('');
   const [list, setList] = useState<ListInt[]>([{id: 1, text: '헬로알앤'}]);
@@ -32,7 +35,7 @@ const TodoList: React.FC<prop> = (props) => {
   };
 
   return (
-    <>
+    <S.Container>
       <TextInput
         placeholder="할 일"
         onChange={inputChange}
@@ -42,11 +45,13 @@ const TodoList: React.FC<prop> = (props) => {
         return (
           <>
             <Text>{ele.text}</Text>
-            <Button style={styles.buttona} onPress={() => deleteItem(ele.id)} title="삭제" />
+            <S.DeleteBtn  onPress={() => deleteItem(ele.id)}>
+              <Text >Press Here</Text>
+            </S.DeleteBtn>
           </>
         );
       })}
-    </>
+    </S.Container>  
   );
 };
 export default TodoList;

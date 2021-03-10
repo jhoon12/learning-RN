@@ -1,12 +1,24 @@
-import React from 'react';
-import {StyleSheet} from 'react-native';
+// import React from 'react';
+// import {StyleSheet, ViewStyle} from 'react-native';
 
+// const styles = StyleSheet.create({
+//   buttona: {
+//     flexDirection: 'row',
+//     width: 50,
+//     height: 50,
+//     backgroundColor: '#DDDDDD',
+//   },
+// });
 
-const styles = StyleSheet.create({
-  buttona: {
-    flexDirection: 'row',
-    width: 50,
-    height: 50,
-  },
-});
-export default styles;
+// export default styles;
+
+import React, {FC} from 'react';
+// import {ViewProps} from 'react-native';
+import styled from 'styled-components/native';
+
+export const Container = styled.View`
+  background-color: #F3F3F3;
+`;
+export const DeleteBtn = styled.TouchableOpacity`
+  background-color:red;
+` 
